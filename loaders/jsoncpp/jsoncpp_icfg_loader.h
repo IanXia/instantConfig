@@ -6,6 +6,7 @@
 
 #include <iterator>
 #include <fstream>
+#include <memory>
 
 class jsoncppLoader{
 
@@ -25,11 +26,13 @@ public:
     file>>std::noskipws;
     
     std::copy(std::istream_iterator<char>(file), std::istream_iterator<char>(), std::back_inserter(fileContent));
-    Json::Reader reader;
-    bool success = reader.parse(fileContent, mRoot);
+    JSONCPP_STRING errs;
+    Json::CharReaderBuilder readerBuilder;
+    std::unique_ptr<Json::CharReader> const jsonReader(readerBuilder.newCharReader());
+    bool success = jsonReader->parse(fileContent.c_str(), fileContent.c_str()+fileContent.length(), &mRoot, &errs);
     
-    if (!success){
-      throw std::string("parse error in file "+fileName + " : "+reader.getFormattedErrorMessages());
+    if (!success || !errs.empty()){
+      throw std::string("parse error in file "+fileName + " : "+ errs);
     }
   }
   
@@ -175,7 +178,7 @@ public:
 		  throw std::string("value " + name + " is expected to be an array");
 	  }
 
-	  for (size_t i = 0; i<from.size(); ++i) {
+	  for (int i = 0; i<from.size(); ++i) {
 		  ValueT outputValue;
 		  extract(from[i], name + "[" + std::to_string(i) + "]", outputValue);
 		  dest.push_back(outputValue);

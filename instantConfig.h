@@ -2027,12 +2027,12 @@ namespace icfg{
       
       template <typename SettingName>
       auto get(SettingName) -> decltype(result.template get<SettingName>()){
-        return result.get<SettingName>();
+        return result.template get<SettingName>();
       }
       
       template <typename SettingName>
       auto getSetting(SettingName) -> decltype(result.template getSetting<SettingName>()){
-        return result.getSetting<SettingName>();
+        return result.template getSetting<SettingName>();
       }
     };
 
@@ -2080,7 +2080,7 @@ namespace icfg{
         if (hasError()){
           throw std::string("Cannot access  config when error occured");
         }
-        return result.get<Name>();
+        return result.template get<Name>();
       }
       
       template <typename Name>
@@ -2088,7 +2088,7 @@ namespace icfg{
         if (hasError()){
           throw std::string("Cannot access  config when error occured");
         }
-        return result.getSetting<Name>();
+        return result.template getSetting<Name>();
       }
       
       bool hasError() const{
